@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LoginActivity">
+
+    <TextView
+        android:textColor="@color/red"
+        android:layout_marginTop="150dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WELCOME USER"
+        android:textStyle="bold"
+        android:layout_marginLeft="20dp"
+
+        android:textSize="50dp">
+    </TextView>
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="50dp"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:textColor="@color/rose"
+        android:text="Login to continue">
+    </TextView>
+
+    <EditText
+        android:id="@+id/emailEditText"
+        android:background="@drawable/shapes"
+        android:layout_width="match_parent"
+        android:layout_marginRight="50dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="20dp"
+        android:inputType="textEmailAddress"
+        android:textStyle="bold"
+        android:hint="  EMAIL">
+
+    </EditText>
+
+    <EditText
+        android:id="@+id/passwordEditText"
+        android:background="@drawable/shapes"
+        android:layout_marginRight="50dp"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_height="48dp"
+        android:textStyle="bold"
+        android:inputType="textPassword"
+        android:hint=" PASSWORD">
+    </EditText>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/LoginButton"
+            android:layout_width="120dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="40dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:background="@drawable/button"
+            android:textSize="15sp"
+            android:text="Login" />
+
+
+    </LinearLayout>
+    <TextView
+        android:id="@+id/Register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Register"
+        android:layout_marginTop="30dp"
+        android:textStyle="bold"
+        android:textColor="@color/red"
+        android:textSize="20dp"/>
+</LinearLayout>

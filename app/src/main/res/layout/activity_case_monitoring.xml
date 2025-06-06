@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".CaseMonitoringActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CASE MONITORING"
+            android:textStyle="bold"
+            android:textColor="@color/red"
+            android:textSize="30dp">
+
+        </TextView>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:src="@drawable/profile" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/line_shape"/>
+
+    <ImageView
+        android:layout_width="61dp"
+        android:layout_height="66dp"
+        android:src="@drawable/analytics">
+    </ImageView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/line2"
+        android:layout_marginBottom="200dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/line2" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="61dp"
+            android:layout_height="66dp"
+            android:src="@drawable/analytics">
+        </ImageView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="   current week"
+            android:textColor="@color/black"
+            android:textSize="40dp">
+        </TextView>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:textColor="@color/black"
+            android:text="          Disease"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:layout_marginRight="20dp"
+            android:textColor="@color/black"
+            android:text="          place"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|bottom"
+            android:paddingLeft="20dp"
+            android:text="number of              infected"
+            android:textColor="@color/black"
+            android:textSize="20dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="90dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/homeB"
+            android:layout_width="67dp"
+            android:layout_height="57dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/homeb"
+            tools:ignore="SpeakableTextPresentCheck"></ImageButton>
+
+        <ImageButton
+            android:id="@+id/newsb"
+            android:layout_width="66dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/newsb"
+            tools:ignore="SpeakableTextPresentCheck"></ImageButton>
+
+
+        <ImageButton
+            android:id="@+id/profileb"
+            android:layout_width="65dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/profileb"
+            tools:ignore="SpeakableTextPresentCheck"></ImageButton>
+
+        <ImageButton
+            android:id="@+id/analb"
+            android:layout_width="67dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/analb"
+            tools:ignore="SpeakableTextPresentCheck"></ImageButton>
+    </LinearLayout>
+
+</LinearLayout>
