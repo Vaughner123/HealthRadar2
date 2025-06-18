@@ -6,86 +6,86 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:paddingHorizontal="30dp"
+    android:paddingTop="100dp"
+    android:background="@color/white"
     tools:context=".LoginActivity">
 
+    <!-- Welcome Title -->
     <TextView
-        android:textColor="@color/red"
-        android:layout_marginTop="150dp"
+        android:id="@+id/welcomeTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="WELCOME USER"
+        android:textSize="36sp"
         android:textStyle="bold"
-        android:layout_marginLeft="20dp"
+        android:textColor="@color/red"
+        android:layout_gravity="start" />
 
-        android:textSize="50dp">
-    </TextView>
+    <!-- Subtitle -->
     <TextView
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="50dp"
-        android:textStyle="bold"
-        android:textSize="20sp"
+        android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
+        android:text="Login to continue"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:textColor="@color/rose"
-        android:text="Login to continue">
-    </TextView>
+        android:layout_marginTop="16dp"
+        android:layout_gravity="start" />
 
+    <!-- Email Input -->
     <EditText
         android:id="@+id/emailEditText"
-        android:background="@drawable/shapes"
         android:layout_width="match_parent"
-        android:layout_marginRight="50dp"
         android:layout_height="48dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="32dp"
+        android:hint="EMAIL"
         android:inputType="textEmailAddress"
+        android:background="@drawable/shapes"
         android:textStyle="bold"
-        android:hint="  EMAIL">
+        android:paddingStart="16dp" />
 
-    </EditText>
-
+    <!-- Password Input -->
     <EditText
         android:id="@+id/passwordEditText"
-        android:background="@drawable/shapes"
-        android:layout_marginRight="50dp"
         android:layout_width="match_parent"
-        android:layout_marginLeft="30dp"
         android:layout_height="48dp"
-        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:hint="PASSWORD"
         android:inputType="textPassword"
-        android:hint=" PASSWORD">
-    </EditText>
+        android:background="@drawable/shapes"
+        android:textStyle="bold"
+        android:paddingStart="16dp" />
 
+    <!-- Login Button -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:gravity="right"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="32dp">
 
         <Button
             android:id="@+id/LoginButton"
             android:layout_width="120dp"
             android:layout_height="48dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginRight="40dp"
+            android:text="Login"
+            android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="@color/white"
-            android:background="@drawable/button"
-            android:textSize="15sp"
-            android:text="Login" />
-
-
+            android:background="@drawable/button" />
     </LinearLayout>
+
+    <!-- Register Link -->
     <TextView
         android:id="@+id/Register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:text="Register"
-        android:layout_marginTop="30dp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/red"
-        android:textSize="20dp"/>
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center" />
 </LinearLayout>
