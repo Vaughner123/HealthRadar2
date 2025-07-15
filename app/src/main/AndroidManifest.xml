@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -20,33 +19,37 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HealthRadar"
         tools:targetApi="31">
-
-        <!-- Splash screen as launcher -->
+        <activity
+            android:name=".News_Article"
+            android:exported="false" />
+        <activity
+            android:name=".NewsAdapter"
+            android:exported="false" /> <!-- Splash screen as launcher -->
         <activity
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Other activities -->
+        </activity> <!-- Other activities -->
         <activity
             android:name=".SignUpActivity"
             android:exported="false" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="true">
-            <meta-data android:name="osmdroid.basePath" android:value="osmdroid" />
-            <meta-data android:name="osmdroid.cachePath" android:value="osmdroid/cache" />
+            <meta-data
+                android:name="osmdroid.basePath"
+                android:value="osmdroid" />
+            <meta-data
+                android:name="osmdroid.cachePath"
+                android:value="osmdroid/cache" />
         </activity>
-
         <activity
             android:name=".DashBoardActivity"
             android:exported="false" />
-
     </application>
 
 </manifest>

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import kotlin.jvm.java
 
 class DashBoardActivity : AppCompatActivity() {
 
@@ -40,7 +41,7 @@ class DashBoardActivity : AppCompatActivity() {
                     loadFragment(HomeFragment())
                     true
                 }
-                R.id.nav_news -> {
+                R.id.nav_news-> {
                     loadFragment(NewsFragment())
                     true
                 }

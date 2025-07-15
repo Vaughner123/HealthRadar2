@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.capstone.healthradar.RecordFragment.Companion.editHistory
 
 class RecordFragment : Fragment() {
 

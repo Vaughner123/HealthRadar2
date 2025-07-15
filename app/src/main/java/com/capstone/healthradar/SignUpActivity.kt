@@ -1,13 +1,11 @@
 package com.capstone.healthradar
 
-import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
 import android.widget.*
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -16,17 +14,9 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_sign_up)
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         // Initialize Firebase
         auth = FirebaseAuth.getInstance()
@@ -43,6 +33,7 @@ class SignUpActivity : AppCompatActivity() {
         val confirmPassword = findViewById<EditText>(R.id.confirmPasswordEditText)
         val municipalitySpinner = findViewById<Spinner>(R.id.municipalitySpinner)
         val signUpButton = findViewById<Button>(R.id.signUpButton)
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
         // Set up spinner with dummy municipalities
         val municipalities = arrayOf("Select Municipality", "Liloan", "Consolacion", "Mandaue")
@@ -74,6 +65,11 @@ class SignUpActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (!Patterns.PHONE.matcher(phoneNumber).matches()) {
+                Toast.makeText(this, "Invalid phone number.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (emailText != confirmEmailText) {
                 Toast.makeText(this, "Emails do not match.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -89,6 +85,11 @@ class SignUpActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // Show progress bar & disable button
+            progressBar.visibility = View.VISIBLE
+            signUpButton.isEnabled = false
+            signUpButton.text = "Registering..."
+
             // Register user
             auth.createUserWithEmailAndPassword(emailText, passwordText)
                 .addOnCompleteListener { task ->
@@ -103,17 +104,29 @@ class SignUpActivity : AppCompatActivity() {
                             "municipality" to selectedMunicipality
                         )
 
-                        db.collection("users").document(userId)
+                        db.collection("healthradarDB")
+                            .document("users")
+                            .collection("user")
+                            .document(userId)
                             .set(userMap)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Account created successfully!", Toast.LENGTH_LONG).show()
-                                // TODO: navigate to main activity or login screen
+                                val intent = Intent(this, LoginActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                                startActivity(intent)
+                                finish()
                             }
                             .addOnFailureListener {
                                 Toast.makeText(this, "Failed to save user data: ${it.message}", Toast.LENGTH_LONG).show()
+                                progressBar.visibility = View.GONE
+                                signUpButton.isEnabled = true
+                                signUpButton.text = "Sign Up"
                             }
                     } else {
                         Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                        progressBar.visibility = View.GONE
+                        signUpButton.isEnabled = true
+                        signUpButton.text = "Sign Up"
                     }
                 }
         }

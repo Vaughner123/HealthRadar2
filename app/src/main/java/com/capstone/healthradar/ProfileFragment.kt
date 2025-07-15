@@ -2,6 +2,7 @@ package com.capstone.healthradar
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,62 +39,61 @@ class ProfileFragment : Fragment() {
         emailTextView = view.findViewById(R.id.emailTextView)
         municipalityTextView = view.findViewById(R.id.municipalityTextView)
 
-        // Initialize Edit Profile button
-        val editProfileButton = view.findViewById<Button>(R.id.editProfileButton)
-
         // Load user data
         loadUserData()
 
-        // Handle logout
+        // Handle Logout Button
         val logoutButton = view.findViewById<Button>(R.id.logoutButton)
         logoutButton.setOnClickListener {
             auth.signOut()
             Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
-            val intent = Intent(requireContext(), LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(requireContext(), LoginActivity::class.java))
             requireActivity().finish()
         }
 
-        // Handle edit profile navigation
+        // Handle Edit Profile Button
+        val editProfileButton = view.findViewById<Button>(R.id.editProfileButton)
         editProfileButton.setOnClickListener {
-            val transaction = parentFragmentManager.beginTransaction()
-            transaction.setCustomAnimations(
-                android.R.anim.fade_in, android.R.anim.fade_out,
-                android.R.anim.fade_in, android.R.anim.fade_out
-            )
-            transaction.replace(
-                R.id.nav_host_fragment,
-                EditProfileFragment()
-            )
-            transaction.addToBackStack(null)
-            transaction.commit()
+            parentFragmentManager.beginTransaction().apply {
+                setCustomAnimations(
+                    android.R.anim.fade_in, android.R.anim.fade_out,
+                    android.R.anim.fade_in, android.R.anim.fade_out
+                )
+                replace(R.id.nav_host_fragment, EditProfileFragment())
+                addToBackStack(null)
+                commit()
+            }
         }
 
         return view
     }
 
     private fun loadUserData() {
-        val userId = auth.currentUser?.uid
-        if (userId != null) {
-            db.collection("users").document(userId).get()
+        val user = auth.currentUser
+        if (user != null) {
+            db.collection("healthradarDB").document("users")
+                .collection("user").document(user.uid).get()
                 .addOnSuccessListener { document ->
-                    if (document != null && document.exists()) {
-                        val firstName = document.getString("firstName") ?: ""
-                        val lastName = document.getString("lastName") ?: ""
-                        val phone = document.getString("phone") ?: ""
-                        val email = document.getString("email") ?: ""
-                        val municipality = document.getString("municipality") ?: ""
+                    if (document.exists()) {
+                        val firstName = document.getString("firstName").orEmpty()
+                        val lastName = document.getString("lastName").orEmpty()
+                        val phone = document.getString("phone").orEmpty()
+                        val email = document.getString("email").orEmpty()
+                        val municipality = document.getString("municipality").orEmpty()
 
                         fullNameTextView.text = "$firstName $lastName"
                         phoneTextView.text = phone
                         emailTextView.text = email
                         municipalityTextView.text = municipality
+
+                        Log.d("ProfileFragment", "User data loaded: ${document.data}")
                     } else {
                         Toast.makeText(requireContext(), "Profile not found", Toast.LENGTH_SHORT).show()
                     }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
+                .addOnFailureListener { e ->
+                    Toast.makeText(requireContext(), "Failed to load profile: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Log.e("ProfileFragment", "Error loading profile", e)
                 }
         } else {
             Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
