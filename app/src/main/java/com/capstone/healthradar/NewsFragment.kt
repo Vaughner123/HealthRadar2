@@ -35,7 +35,7 @@ class NewsFragment : Fragment() {
 
     private fun fetchNews() {
         val url =
-            "https://newsapi.org/v2/everything?q=philippines+(infectious+disease+OR+infection+OR+virus+OR+outbreak)&from=2025-06-15&sortBy=publishedAt&language=en&apiKey=81d5ffd08f9042f5bd1d49dd6c6404b8"
+            "https://newsapi.org/v2/everything?q=philippines+(infectious+disease+OR+infection+OR+virus+OR+outbreak)&from=2025-06-15&sortBy=publishedAt&language=en&apiKey=$apiKey"
 
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
@@ -43,14 +43,18 @@ class NewsFragment : Fragment() {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 activity?.runOnUiThread {
-                    Toast.makeText(requireContext(), "Failed to fetch news", Toast.LENGTH_SHORT).show()
+                    if (isAdded) {
+                        Toast.makeText(requireContext(), "Failed to fetch news", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (!response.isSuccessful) {
                     activity?.runOnUiThread {
-                        Toast.makeText(requireContext(), "Error: ${response.message}", Toast.LENGTH_SHORT).show()
+                        if (isAdded) {
+                            Toast.makeText(requireContext(), "Error: ${response.message}", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     return
                 }
@@ -77,12 +81,16 @@ class NewsFragment : Fragment() {
                         }
 
                         activity?.runOnUiThread {
-                            recyclerView.adapter?.notifyDataSetChanged()
+                            if (isAdded) {
+                                recyclerView.adapter?.notifyDataSetChanged()
+                            }
                         }
 
                     } catch (e: Exception) {
                         activity?.runOnUiThread {
-                            Toast.makeText(requireContext(), "Parsing error", Toast.LENGTH_SHORT).show()
+                            if (isAdded) {
+                                Toast.makeText(requireContext(), "Parsing error", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }

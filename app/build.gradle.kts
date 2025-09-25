@@ -29,11 +29,12 @@ android {
     }
 
     buildFeatures {
+        viewBinding = true
         compose = false
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13" // Required for Compose Material3 1.2.1
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
 
     compileOptions {
@@ -47,6 +48,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.firebase.messaging)
     val composeBom = platform("androidx.compose:compose-bom:2024.05.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -57,8 +59,10 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore.ktx)
+    // ✅ Firebase BoM (keeps all Firebase versions consistent)
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)

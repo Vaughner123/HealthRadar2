@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -8,6 +9,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- ✅ Required for Android 13+ push notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -19,24 +23,32 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HealthRadar"
         tools:targetApi="31">
+
         <activity
-            android:name=".News_Article"
-            android:exported="false" />
+            android:name=".NewsArticle"
+            android:exported="false"
+            tools:ignore="Instantiatable,MissingClass" />
+
         <activity
             android:name=".NewsAdapter"
-            android:exported="false" /> <!-- Splash screen as launcher -->
+            android:exported="false"
+            tools:ignore="Instantiatable" />
+
+        <!-- Splash screen as launcher -->
         <activity
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Other activities -->
+        </activity>
+
+        <!-- Other activities -->
         <activity
             android:name=".SignUpActivity"
             android:exported="false" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -47,9 +59,18 @@
                 android:name="osmdroid.cachePath"
                 android:value="osmdroid/cache" />
         </activity>
+
         <activity
             android:name=".DashBoardActivity"
             android:exported="false" />
-    </application>
 
+        <!-- ✅ Firebase Messaging Service -->
+        <service
+            android:name=".MyfirebaseService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+    </application>
 </manifest>
