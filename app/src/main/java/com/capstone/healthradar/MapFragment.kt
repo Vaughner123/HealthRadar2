@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -33,13 +32,14 @@ class MapFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val context = requireContext()
+        val context = requireContext() // ✅ Correct requireContext()
         Configuration.getInstance().load(context, context.getSharedPreferences("prefs", 0))
 
         val rootView = inflater.inflate(R.layout.fragment_map, container, false)
         val mapContainer = rootView.findViewById<FrameLayout>(R.id.map_container)
         val formContainer = rootView.findViewById<LinearLayout>(R.id.input_container)
 
+        // Initialize map
         mapView = MapView(context)
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
@@ -48,6 +48,7 @@ class MapFragment : Fragment() {
 
         mapContainer.addView(mapView)
 
+        // Initial demo data
         val initialAreas = listOf(
             AreaData("Liloan", GeoPoint(10.4018, 123.9959), 20),
             AreaData("Consolacion", GeoPoint(10.3733, 123.9496), 60),
@@ -72,20 +73,9 @@ class MapFragment : Fragment() {
                     val oldCases = area.cases
                     area.cases = newCases
 
+                    // Remove old circle
                     area.overlay?.let { mapView.overlays.remove(it) }
                     drawCircle(area)
-
-                    val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                        .format(Date())
-
-                    RecordFragment.addRecord(
-                        RecordFragment.EditRecord(
-                            areaName = area.name,
-                            oldValue = oldCases,
-                            newValue = newCases,
-                            timestamp = timestamp
-                        )
-                    )
 
                     mapView.controller.animateTo(area.location)
                     mapView.invalidate()

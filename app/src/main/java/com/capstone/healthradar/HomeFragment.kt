@@ -1,6 +1,8 @@
 package com.capstone.healthradar
 
+import android.annotation.SuppressLint
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
@@ -16,6 +19,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
 import java.util.*
 
 class HomeFragment : Fragment() {
@@ -23,26 +27,78 @@ class HomeFragment : Fragment() {
     private lateinit var lineChart: LineChart
     private lateinit var pieChart: PieChart
     private lateinit var spinner: Spinner
+    private lateinit var pieChartTitle: TextView
 
     private val db = FirebaseFirestore.getInstance()
     private val municipalities = listOf("Liloan", "Consolacion", "Mandaue")
     private val TAG = "HomeFragment"
+    private val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
+        // Initialize views
         lineChart = view.findViewById(R.id.lineChart)
         pieChart = view.findViewById(R.id.pieChart)
         spinner = view.findViewById(R.id.municipalitySpinner)
+        pieChartTitle = view.findViewById(R.id.pieChartTitle)
 
+        setupCharts()
         setupSpinner()
-        // Optionally set default selection (will trigger listener)
-        spinner.setSelection(0)
 
         return view
+    }
+
+    private fun setupCharts() {
+        // ----- PIE CHART -----
+        pieChart.apply {
+            setBackgroundColor(Color.WHITE)
+            setUsePercentValues(true)
+            isDrawHoleEnabled = true
+            holeRadius = 45f
+            transparentCircleRadius = 50f
+            setEntryLabelColor(Color.DKGRAY)
+            setEntryLabelTextSize(12f)
+            setCenterTextSize(16f)
+            setCenterTextTypeface(Typeface.DEFAULT_BOLD)
+            description.isEnabled = false
+            legend.isEnabled = true
+            setExtraOffsets(10f, 10f, 10f, 10f)
+        }
+
+        // ----- LINE CHART -----
+        lineChart.apply {
+            setBackgroundColor(Color.WHITE)
+            axisRight.isEnabled = false
+            description.isEnabled = false
+            setTouchEnabled(true)
+            isDragEnabled = true
+            setScaleEnabled(true)
+            setPinchZoom(true)
+            setDrawGridBackground(true)
+            setGridBackgroundColor(Color.parseColor("#F5F5F5"))
+
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                textColor = Color.DKGRAY
+                textSize = 12f
+                granularity = 1f
+            }
+
+            axisLeft.apply {
+                textColor = Color.DKGRAY
+                textSize = 12f
+                setDrawGridLines(true)
+                gridColor = Color.LTGRAY
+            }
+
+            animateX(800)
+        }
     }
 
     private fun setupSpinner() {
@@ -53,136 +109,129 @@ class HomeFragment : Fragment() {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedMunicipality = municipalities[position]
+                pieChartTitle.text = "$selectedMunicipality Chart"
+
+                // Load charts safely
                 loadPieChart(selectedMunicipality)
                 loadLineChart(selectedMunicipality)
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+
+        // Select first item safely after views initialized
+        spinner.setSelection(0)
     }
 
-    /**
-     * Loads pie chart from:
-     * UploadedDisease / {municipality} / diseaseEntries
-     *
-     * Each disease entry document should have:
-     * - diseaseName: string
-     * - cases: number
-     */
     private fun loadPieChart(municipality: String) {
-        val subcollection = "diseaseEntries" // make sure this matches your Firestore subcollection name
-        db.collection("UploadedDisease")
-            .document(municipality)
-            .collection(subcollection)
+        db.collection("healthradarDB")
+            .document("centralizedData")
+            .collection("allCases")
             .get()
             .addOnSuccessListener { snapshot ->
+                val filtered = snapshot.documents.filter {
+                    val dbMunicipality = it.getString("Municipality")?.replace("-", "")?.lowercase() ?: ""
+                    dbMunicipality == municipality.replace("-", "").lowercase()
+                }
+
                 val diseaseSums = mutableMapOf<String, Float>()
-                for (doc in snapshot.documents) {
-                    val name = doc.getString("diseaseName") ?: "Unknown"
-                    // cases might be stored as Long or Double
-                    val cases = (doc.getLong("cases")?.toFloat()
-                        ?: doc.getDouble("cases")?.toFloat()
-                        ?: 0f)
-                    if (cases > 0f) {
-                        diseaseSums[name] = (diseaseSums[name] ?: 0f) + cases
-                    }
+                for (doc in filtered) {
+                    val name = doc.getString("DiseaseName") ?: "Unknown"
+                    val cases = doc.getString("CaseCount")?.toFloatOrNull() ?: 0f
+                    if (cases > 0f) diseaseSums[name] = (diseaseSums[name] ?: 0f) + cases
                 }
 
                 if (diseaseSums.isNotEmpty()) {
                     val entries = diseaseSums.map { PieEntry(it.value, it.key) }
-                    val ds = PieDataSet(ArrayList(entries), "Disease distribution in $municipality")
-                    ds.setDrawValues(true)
-                    // simple color set; you can use a larger palette if you have more categories
-                    ds.colors = listOf(Color.RED, Color.GREEN, Color.MAGENTA, Color.CYAN, Color.YELLOW)
-                    ds.valueTextColor = Color.BLACK
+                    val ds = PieDataSet(ArrayList(entries), "")
+                    ds.colors = listOf(
+                        Color.parseColor("#FFB74D"),
+                        Color.parseColor("#4DB6AC"),
+                        Color.parseColor("#BA68C8"),
+                        Color.parseColor("#81C784"),
+                        Color.parseColor("#64B5F6")
+                    )
+                    ds.valueTextColor = Color.DKGRAY
                     ds.valueTextSize = 12f
+                    ds.sliceSpace = 2f
+                    ds.selectionShift = 5f
 
-                    val data = PieData(ds)
-                    pieChart.data = data
-                    pieChart.centerText = municipality
+                    pieChart.data = PieData(ds)
+                    pieChart.centerText = "$municipality\nDisease Cases"
                     pieChart.invalidate()
-                    pieChart.animateY(600)
+                    pieChart.animateY(800)
                 } else {
-                    Log.w(TAG, "No pie entries for $municipality")
                     pieChart.clear()
+                    pieChart.invalidate()
                 }
             }
             .addOnFailureListener { e ->
                 Log.e(TAG, "Failed to fetch pie data", e)
                 pieChart.clear()
+                pieChart.invalidate()
             }
     }
 
-    /**
-     * Loads line chart from:
-     * UploadedDisease / {municipality} / diseaseEntries
-     *
-     * Groups by week-of-month into 4 buckets: Week 1..Week 4
-     * Each disease entry document should have:
-     * - cases: number
-     * - date: Timestamp
-     */
     private fun loadLineChart(municipality: String) {
-        val subcollection = "diseaseEntries" // same as above
-        db.collection("UploadedDisease")
-            .document(municipality)
-            .collection(subcollection)
+        db.collection("healthradarDB")
+            .document("centralizedData")
+            .collection("allCases")
             .get()
             .addOnSuccessListener { snapshot ->
-                // 4 buckets for Week 1..4
+                val filtered = snapshot.documents.filter {
+                    val dbMunicipality = it.getString("Municipality")?.replace("-", "")?.lowercase() ?: ""
+                    dbMunicipality == municipality.replace("-", "").lowercase()
+                }
+
                 val weekSums = FloatArray(4) { 0f }
-                for (doc in snapshot.documents) {
-                    val cases = (doc.getLong("cases")?.toFloat()
-                        ?: doc.getDouble("cases")?.toFloat()
-                        ?: 0f)
-                    val timestamp = doc.getTimestamp("date")
-                    val date = timestamp?.toDate()
+                for (doc in filtered) {
+                    val cases = doc.getString("CaseCount")?.toFloatOrNull() ?: 0f
+                    val date = when (val dateField = doc.get("DateReported")) {
+                        is com.google.firebase.Timestamp -> dateField.toDate()
+                        is String -> try { isoFormat.parse(dateField) } catch (e: Exception) { null }
+                        else -> null
+                    }
+
                     if (date != null) {
                         val cal = Calendar.getInstance()
                         cal.time = date
-                        val day = cal.get(Calendar.DAY_OF_MONTH) // 1..31
-                        // group into rough 4-week buckets:
-                        val weekIndex = ((day - 1) / 7).coerceIn(0, 3) // 0..3
-                        weekSums[weekIndex] = weekSums[weekIndex] + cases
-                    } else {
-                        // if no date, we can place into last bucket or skip; here we skip
+                        val day = cal.get(Calendar.DAY_OF_MONTH)
+                        val weekIndex = ((day - 1) / 7).coerceIn(0, 3)
+                        weekSums[weekIndex] += cases
                     }
                 }
 
                 val weeks = listOf("Week 1", "Week 2", "Week 3", "Week 4")
                 val entries = ArrayList<Entry>()
-                for (i in weekSums.indices) {
-                    entries.add(Entry(i.toFloat(), weekSums[i]))
-                }
+                for (i in weekSums.indices) entries.add(Entry(i.toFloat(), weekSums[i]))
 
-                val hasData = weekSums.any { it > 0f }
-                if (hasData) {
+                if (weekSums.any { it > 0f }) {
                     val ds = LineDataSet(entries, "Weekly cases in $municipality")
-                    ds.color = Color.BLUE
-                    ds.valueTextColor = Color.BLACK
-                    ds.valueTextSize = 10f
+                    ds.color = Color.parseColor("#FF8A65")
+                    ds.valueTextColor = Color.DKGRAY
+                    ds.valueTextSize = 12f
                     ds.setDrawCircles(true)
+                    ds.circleRadius = 6f
+                    ds.setCircleColor(Color.parseColor("#4DB6AC"))
+                    ds.lineWidth = 3f
                     ds.mode = LineDataSet.Mode.CUBIC_BEZIER
+                    ds.setDrawFilled(true)
+                    ds.fillColor = Color.parseColor("#FFCCBC")
+                    ds.fillAlpha = 80
 
-                    val lineData = LineData(ds)
-                    lineChart.data = lineData
-
-                    lineChart.xAxis.apply {
-                        granularity = 1f
-                        position = XAxis.XAxisPosition.BOTTOM
-                        valueFormatter = IndexAxisValueFormatter(weeks)
-                    }
-                    lineChart.axisRight.isEnabled = false
-                    lineChart.description.isEnabled = false
+                    lineChart.data = LineData(ds)
+                    lineChart.xAxis.valueFormatter = IndexAxisValueFormatter(weeks)
                     lineChart.invalidate()
-                    lineChart.animateX(700)
+                    lineChart.animateX(800)
                 } else {
-                    Log.w(TAG, "No line entries for $municipality")
                     lineChart.clear()
+                    lineChart.invalidate()
                 }
             }
             .addOnFailureListener { e ->
                 Log.e(TAG, "Failed to fetch line data", e)
                 lineChart.clear()
+                lineChart.invalidate()
             }
     }
 }
