@@ -32,7 +32,8 @@ class HomeFragment : Fragment() {
     private val db = FirebaseFirestore.getInstance()
     private val municipalities = listOf("Liloan", "Consolacion", "Mandaue")
     private val TAG = "HomeFragment"
-    private val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+    private val isoFormat =
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -102,16 +103,26 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupSpinner() {
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, municipalities)
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            municipalities
+        )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (!this@HomeFragment::pieChartTitle.isInitialized) return
+
                 val selectedMunicipality = municipalities[position]
                 pieChartTitle.text = "$selectedMunicipality Chart"
 
-                // Load charts safely
                 loadPieChart(selectedMunicipality)
                 loadLineChart(selectedMunicipality)
             }
@@ -119,8 +130,10 @@ class HomeFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        // Select first item safely after views initialized
-        spinner.setSelection(0)
+        // ✅ Post to ensure selection happens after layout is ready
+        spinner.post {
+            spinner.setSelection(0)
+        }
     }
 
     private fun loadPieChart(municipality: String) {
@@ -130,7 +143,8 @@ class HomeFragment : Fragment() {
             .get()
             .addOnSuccessListener { snapshot ->
                 val filtered = snapshot.documents.filter {
-                    val dbMunicipality = it.getString("Municipality")?.replace("-", "")?.lowercase() ?: ""
+                    val dbMunicipality =
+                        it.getString("Municipality")?.replace("-", "")?.lowercase() ?: ""
                     dbMunicipality == municipality.replace("-", "").lowercase()
                 }
 
@@ -179,7 +193,8 @@ class HomeFragment : Fragment() {
             .get()
             .addOnSuccessListener { snapshot ->
                 val filtered = snapshot.documents.filter {
-                    val dbMunicipality = it.getString("Municipality")?.replace("-", "")?.lowercase() ?: ""
+                    val dbMunicipality =
+                        it.getString("Municipality")?.replace("-", "")?.lowercase() ?: ""
                     dbMunicipality == municipality.replace("-", "").lowercase()
                 }
 
@@ -188,7 +203,11 @@ class HomeFragment : Fragment() {
                     val cases = doc.getString("CaseCount")?.toFloatOrNull() ?: 0f
                     val date = when (val dateField = doc.get("DateReported")) {
                         is com.google.firebase.Timestamp -> dateField.toDate()
-                        is String -> try { isoFormat.parse(dateField) } catch (e: Exception) { null }
+                        is String -> try {
+                            isoFormat.parse(dateField)
+                        } catch (e: Exception) {
+                            null
+                        }
                         else -> null
                     }
 

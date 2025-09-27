@@ -115,6 +115,20 @@ class DashBoardActivity : AppCompatActivity() {
     }
 
     // 🔹 Step 2: Fetch FCM token
+//        private fun getFCMToken() {
+//            FirebaseMessaging.getInstance().token
+//                .addOnCompleteListener { task ->
+//                    if (!task.isSuccessful) {
+//                        Log.w("DashBoardActivity", "Fetching FCM registration token failed", task.exception)
+//                        return@addOnCompleteListener
+//                    }
+//                    // Get new FCM registration token
+//                    val token = task.result
+//                    Log.d("DashBoardActivity", "FCM Token: $token")
+//                    // TODO: send this token to your backend if needed
+//                }
+//        }
+    // 🔹 Step 2: Fetch FCM token + Subscribe to a topic
     private fun getFCMToken() {
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener { task ->
@@ -122,10 +136,25 @@ class DashBoardActivity : AppCompatActivity() {
                     Log.w("DashBoardActivity", "Fetching FCM registration token failed", task.exception)
                     return@addOnCompleteListener
                 }
+
                 // Get new FCM registration token
                 val token = task.result
                 Log.d("DashBoardActivity", "FCM Token: $token")
-                // TODO: send this token to your backend if needed
+
+                // TODO: Optionally send this token to your backend if needed
+
+                // 🔔 Subscribe user to a topic (e.g. "alerts")
+                FirebaseMessaging.getInstance().subscribeToTopic("alerts")
+                    .addOnCompleteListener { subTask ->
+                        if (subTask.isSuccessful) {
+                            Log.d("DashBoardActivity", "✅ Subscribed to alerts topic")
+                            Toast.makeText(this, "Subscribed to alerts", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.w("DashBoardActivity", "❌ Failed to subscribe to alerts", subTask.exception)
+                        }
+                    }
             }
     }
+
 }
+
