@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
     // ✅ remove "/api/"
-    private const val BASE_URL = "https://health-radar2-t8fu.vercel.app/"
+    private const val BASE_URL = "https://health-radar2-dvi41ledi-vaughner123s-projects.vercel.app/"
 
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
